@@ -1,7 +1,15 @@
 [package]
+authors = ["Caio Gomes <caiocodes@proton.me>"]
 name = "timeless-partialeq"
 version = "0.1.0"
 edition = "2021"
+license = "AGPL-3.0-or-later"
+homepage = "github.com/caioluis/timeless-partialeq"
+repository = "github.com/caioluis/timeless-partialeq"
+description = "PartialEq, but ignores timestamps, ideal for API testing"
+readme = "README.md"
+keywords = ["partialeq", "testing"]
+categories = ["development-tools::testing"]
 
 [lib]
 proc-macro = true
