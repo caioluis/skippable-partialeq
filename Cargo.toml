@@ -1,7 +1,7 @@
 [package]
 authors = ["Caio Gomes <caiocodes@proton.me>"]
 name = "timeless-partialeq"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "AGPL-3.0-or-later"
 homepage = "https://github.com/caioluis/timeless-partialeq"
