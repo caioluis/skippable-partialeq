@@ -3,6 +3,7 @@
 //! # Examples
 //! ```
 //! use timeless_partialeq::TimelessPartialEq;
+//! use chrono::{DateTime, TimeZone, Utc};
 //! 
 
 //! #[derive(Debug, TimelessPartialEq)]
