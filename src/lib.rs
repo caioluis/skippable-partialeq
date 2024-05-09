@@ -1,3 +1,45 @@
+//! Ignore fields ending with a specific suffix in PartialEq custom implementations.
+//!
+//! # Examples
+//! ```
+//! use timeless_partialeq::TimelessPartialEq;
+//! 
+
+//! #[derive(Debug, TimelessPartialEq)]
+//! #[exclude_suffix(at, date)]
+//! pub struct Post {
+//!     pub id: i64,
+//!     pub content: String,
+//!     pub author: i32,
+//!     pub creation_date: DateTime<Utc>,
+//!     pub updated_at: Option<DateTime<Utc>>,
+//! }
+//! 
+
+//! assert_eq!(
+//!     Post {
+//!         id: 1,
+//!         content: "test".to_string(),
+//!         author: 1,
+//!         creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
+//!         updated_at: Some(Utc.timestamp_millis_opt(1715017020672).unwrap()),
+//!     },
+//!     Post {
+//!         id: 1,
+//!         content: "test".to_string(),
+//!         author: 1,
+//!         creation_date: Utc::now(),
+//!         updated_at: Some(Utc::now()),
+//!     }
+//! ) // true
+//! ```
+//! 
+//! # About the crate
+//! This crate was made to solve a very specific problem: assert the equality of two objects despite the timestamp differences. It was also made so that I could study proc macros.
+//! However, just after a day after publishing it, I realized that it can be broader than just timestamps.
+//! 
+//! I will not make a commitment into iterating this quickly, but it is in my plans to expand the scope of the crate.
+
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
