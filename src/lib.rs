@@ -81,11 +81,11 @@ pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
     let field_comparisons = fields.iter().filter_map(|field| {
         let ident = &field.ident;
         let field_type = &field.ty;
-        let field = ident.as_ref().unwrap().to_string();
+        let field_name = ident.as_ref().unwrap().to_string();
         if args.is_empty() {
             args.push("at".to_string());
         }
-        if args.iter().any(|arg| field.ends_with(&format!("_{}", arg))) {
+        if args.iter().any(|arg| field_name.ends_with(&format!("_{}", arg))) {
             if field_type
             .to_token_stream()
             .to_string()
