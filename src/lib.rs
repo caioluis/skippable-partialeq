@@ -47,7 +47,7 @@ use quote::{quote, ToTokens};
 use syn::{parse_macro_input, DeriveInput};
 
 
-#[proc_macro_derive(TimelessPartialEq, attributes(exclude_suffix))]
+#[proc_macro_derive(TimelessPartialEq, attributes(exclude_suffix, skip))]
 pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
 
@@ -79,6 +79,12 @@ pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
     };
 
     let field_comparisons = fields.iter().filter_map(|field| {
+        for attr in field.attrs.iter() {
+            if attr.path().is_ident("skip") {
+                return None
+            }
+        }
+
         let ident = &field.ident;
         let field_type = &field.ty;
         let field_name = ident.as_ref().unwrap().to_string();

@@ -115,3 +115,33 @@ fn it_works_with_user_attribute_input() {
         }
     )
 }
+
+#[test]
+fn it_skips_specific_fields() {
+    #[derive(Debug, TimelessPartialEq)]
+    pub struct Post {
+        pub id: i64,
+        pub content: String,
+        pub author: i32,
+        pub updated_at: Option<DateTime<Utc>>,
+        #[skip]
+        pub creation_date: DateTime<Utc>,
+    }
+
+    assert_eq!(
+        Post {
+            id: 1,
+            content: "test".to_string(),
+            author: 1,
+            creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
+            updated_at: Some(Utc.timestamp_millis_opt(1715017020672).unwrap()),
+        },
+        Post {
+            id: 1,
+            content: "test".to_string(),
+            author: 1,
+            creation_date: Utc::now(),
+            updated_at: Some(Utc::now()),
+        }
+    )
+}
