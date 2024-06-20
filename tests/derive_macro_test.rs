@@ -4,13 +4,15 @@ use chrono::{DateTime, TimeZone, Utc};
 extern crate timeless_partialeq;
 
 #[test]
-fn it_ignores_fields_ending_with_at() {
+fn it_works_with_user_attribute_input() {
     #[derive(Debug, TimelessPartialEq)]
+    #[exclude_suffix(at, date)]
     pub struct Post {
         pub id: i64,
         pub content: String,
         pub author: i32,
-        pub created_at: DateTime<Utc>,
+        pub updated_at: Option<DateTime<Utc>>,
+        pub creation_date: DateTime<Utc>,
     }
 
     assert_eq!(
@@ -18,13 +20,15 @@ fn it_ignores_fields_ending_with_at() {
             id: 1,
             content: "test".to_string(),
             author: 1,
-            created_at: Utc.timestamp_millis_opt(1715017040672).unwrap(),
+            creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
+            updated_at: Some(Utc.timestamp_millis_opt(1715017020672).unwrap()),
         },
         Post {
             id: 1,
             content: "test".to_string(),
             author: 1,
-            created_at: Utc::now(),
+            creation_date: Utc::now(),
+            updated_at: Some(Utc::now()),
         }
     )
 }
@@ -60,6 +64,7 @@ fn it_fails_without_custom_derive_macro() {
 #[test]
 fn it_checks_optional_timestamps_accordingly() {
     #[derive(Debug, TimelessPartialEq)]
+    #[exclude_suffix(at)]
     pub struct Post {
         pub id: i64,
         pub content: String,
@@ -87,43 +92,12 @@ fn it_checks_optional_timestamps_accordingly() {
 }
 
 #[test]
-fn it_works_with_user_attribute_input() {
-    #[derive(Debug, TimelessPartialEq)]
-    #[exclude_suffix(at, date)]
-    pub struct Post {
-        pub id: i64,
-        pub content: String,
-        pub author: i32,
-        pub updated_at: Option<DateTime<Utc>>,
-        pub creation_date: DateTime<Utc>,
-    }
-
-    assert_eq!(
-        Post {
-            id: 1,
-            content: "test".to_string(),
-            author: 1,
-            creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
-            updated_at: Some(Utc.timestamp_millis_opt(1715017020672).unwrap()),
-        },
-        Post {
-            id: 1,
-            content: "test".to_string(),
-            author: 1,
-            creation_date: Utc::now(),
-            updated_at: Some(Utc::now()),
-        }
-    )
-}
-
-#[test]
 fn it_skips_specific_fields() {
     #[derive(Debug, TimelessPartialEq)]
     pub struct Post {
         pub id: i64,
         pub content: String,
         pub author: i32,
-        pub updated_at: Option<DateTime<Utc>>,
         #[skip]
         pub creation_date: DateTime<Utc>,
     }
@@ -134,14 +108,12 @@ fn it_skips_specific_fields() {
             content: "test".to_string(),
             author: 1,
             creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
-            updated_at: Some(Utc.timestamp_millis_opt(1715017020672).unwrap()),
         },
         Post {
             id: 1,
             content: "test".to_string(),
             author: 1,
             creation_date: Utc::now(),
-            updated_at: Some(Utc::now()),
         }
     )
 }

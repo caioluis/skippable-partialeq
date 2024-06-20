@@ -78,30 +78,34 @@ pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
         panic!("TimelessPartialEq can only be derived for structs with named fields");
     };
 
-    let field_comparisons = fields.iter().filter_map(|field| {
-        for attr in field.attrs.iter() {
-            if attr.path().is_ident("skip") {
-                return None
-            }
-        }
 
-        let ident = &field.ident;
-        let field_type = &field.ty;
-        let field_name = ident.as_ref().unwrap().to_string();
-        if args.is_empty() {
-            args.push("at".to_string());
-        }
-        if args.iter().any(|arg| field_name.ends_with(&format!("_{}", arg))) {
-            if field_type
-            .to_token_stream()
-            .to_string()
-            .starts_with("Option")
-            {
-                return Some(quote! { self.#ident.is_none() && other.#ident.is_none() || self.#ident.is_some() && other.#ident.is_some()});
-            }   
-                None
+    if fields.iter().any(|field| !field.attrs.iter().any(|attr| attr.path().is_ident("skip"))) && args.is_empty() {
+        println!("eita")
+    }
+        
+
+    let field_comparisons = fields.iter().filter_map(|field| {
+        let has_specific_skip = field.attrs.iter().any(|attr| attr.path().is_ident("skip"));
+
+        if has_specific_skip {
+            return None
         } else {
-            Some(quote! { &self.#ident == &other.#ident })
+            let ident = &field.ident;
+            let field_type = &field.ty;
+            let field_name = ident.as_ref().unwrap().to_string();
+    
+            if args.iter().any(|arg| field_name.ends_with(&format!("_{}", arg))) {
+                if field_type
+                .to_token_stream()
+                .to_string()
+                .starts_with("Option")
+                {
+                    return Some(quote! { self.#ident.is_none() && other.#ident.is_none() || self.#ident.is_some() && other.#ident.is_some()});
+                }   
+                    None
+            } else {
+                Some(quote! { &self.#ident == &other.#ident })
+            }
         }
     });
 
