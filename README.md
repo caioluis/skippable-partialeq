@@ -1,21 +1,22 @@
-# timeless-partialeq
-## PartialEq, but ignores timestamps, ideal for API testing
+# skippable-partialeq
+## PartialEq, but you can ignore fields 
 
-This crate provides a custom derive macro `TimelessPartialEq` that allows you to implement `PartialEq` for structs while ignoring fields based on their suffixes.
+This crate provides a custom derive macro `SkippablePartialEq` that allows you to implement `PartialEq` for structs while ignoring fields based on custom rules such as suffixes, as well as specific fields.
 
 ## Usage
-First, add TimelessPartialEq as a dependency.
+First, add SkippablePartialEq as a dependency.
 
 ```zsh
-cargo add timeless-partialeq
+cargo add skippable-partialeq
 ```
 
-Then, derive `TimelessPartialEq` for your struct:
+Then, derive `SkippablePartialEq` for your struct:
 
 ```rust
-use timeless_partialeq::TimelessPartialEq;
+use skippable_partialeq::SkippablePartialEq;
 
-#[derive(Debug, TimelessPartialEq)]
+#[derive(Debug, SkippablePartialEq)]
+#[exclude_suffix(at)]
 pub struct Post {
     pub id: i64,
     pub content: String,
@@ -25,29 +26,21 @@ pub struct Post {
 }
 ```
 
-This will generate an implementation of `PartialEq` that ignores the fields ending with `_at`, while still checking for `Option`'s outer `None` & `Some` values.
+This will generate an implementation of `PartialEq` that ignores the fields ending with `_at`, while still checking for `Option`'s outer `None` & `Some` values. This attribute supports multiple values separated by comma.
 
-You can also use the `#[exclude_suffix]` attribute to filter by specific suffixes:
+You can also use the `#[skip]` attribute to filter by specific fields:
 
 ```rust
-use timeless_partialeq::TimelessPartialEq;
+use skippable_partialeq::SkippablePartialEq;
 
-#[derive(Debug, TimelessPartialEq)]
-#[exclude_suffix(at, date)]
+#[derive(Debug, SkippablePartialEq)]
 pub struct Post {
     pub id: i64,
     pub content: String,
     pub author: i32,
+    #[skip]
     pub creation_date: DateTime<Utc>,
-    pub updated_at: Option<DateTime<Utc>>,
 }
 ```
 
-This would exclude fields ending with `_at` and/or `date`.
-
-
-# About the crate
-This crate was made to solve a very specific problem: assert the equality of two objects despite the timestamp differences. It was also made so that I could study proc macros.
-However, just after a day after publishing it, I realized that it can be broader than just timestamps.
-
-I will not make a commitment into iterating this quickly, but it is in my plans to expand the scope of the crate.
+This would exclude `creation_date` from the comparison.

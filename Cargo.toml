@@ -1,12 +1,12 @@
 [package]
 authors = ["Caio Gomes <caiocodes@proton.me>"]
-name = "timeless-partialeq"
-version = "0.2.0"
+name = "skippable-partialeq"
+version = "1.0.0"
 edition = "2021"
 license = "AGPL-3.0-or-later"
-homepage = "https://github.com/caioluis/timeless-partialeq"
-repository = "https://github.com/caioluis/timeless-partialeq"
-description = "PartialEq, but ignores timestamps, ideal for API testing"
+homepage = "https://github.com/caioluis/skippable-partialeq"
+repository = "https://github.com/caioluis/skippable-partialeq"
+description = "PartialEq, but you can ignore fields"
 readme = "README.md"
 keywords = ["partialeq", "testing"]
 categories = ["development-tools::testing"]
