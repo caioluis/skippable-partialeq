@@ -1,12 +1,12 @@
-//! Ignore fields ending with a specific suffix in PartialEq custom implementations.
+//! Ignore fields in PartialEq custom implementations.
 //!
 //! # Examples
 //! ```
-//! use timeless_partialeq::TimelessPartialEq;
+//! use skippable_partialeq::SkippablePartialEq;
 //! use chrono::{DateTime, TimeZone, Utc};
 //! 
 
-//! #[derive(Debug, TimelessPartialEq)]
+//! #[derive(Debug, SkippablePartialEq)]
 //! #[exclude_suffix(at, date)]
 //! pub struct Post {
 //!     pub id: i64,
@@ -35,11 +35,36 @@
 //! ) // true
 //! ```
 //! 
-//! # About the crate
-//! This crate was made to solve a very specific problem: assert the equality of two objects despite the timestamp differences. It was also made so that I could study proc macros.
-//! However, just after a day after publishing it, I realized that it can be broader than just timestamps.
+//! You can also skip specific fields that do not follow a pattern using the `#[skip]` attribute above the fields you want to ignore:
 //! 
-//! I will not make a commitment into iterating this quickly, but it is in my plans to expand the scope of the crate.
+//! ```
+//! use skippable_partialeq::SkippablePartialEq;
+//! use chrono::{DateTime, TimeZone, Utc};
+//! 
+//! #[derive(Debug, SkippablePartialEq)]
+//! pub struct Post {
+//!     pub id: i64,
+//!     pub content: String,
+//!     pub author: i32,
+//!     #[skip]
+//!     pub creation_date: DateTime<Utc>,
+//! }
+
+//! assert_eq!(
+//!     Post {
+//!         id: 1,
+//!         content: "test".to_string(),
+//!         author: 1,
+//!         creation_date: Utc.timestamp_millis_opt(1715017040672).unwrap(),
+//!     },
+//!     Post {
+//!         id: 1,
+//!         content: "test".to_string(),
+//!         author: 1,
+//!         creation_date: Utc::now(),
+//!     }
+//! )
+//! ```
 
 extern crate proc_macro;
 use proc_macro::TokenStream;
@@ -47,12 +72,11 @@ use quote::{quote, ToTokens};
 use syn::{parse_macro_input, DeriveInput};
 
 
-#[proc_macro_derive(TimelessPartialEq, attributes(exclude_suffix, skip))]
+#[proc_macro_derive(SkippablePartialEq, attributes(exclude_suffix, skip))]
 pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
 
     let mut args: Vec<String> = Vec::new();
-    
     for attr in ast.attrs.iter() {
         if attr.path().is_ident("exclude_suffix") {
             let meta_list = attr.meta.require_list();
@@ -75,12 +99,12 @@ pub fn partial_eq_except_timestamps(input: TokenStream) -> TokenStream {
     {
         named
     } else {
-        panic!("TimelessPartialEq can only be derived for structs with named fields");
+        panic!("SkippablePartialEq can only be derived for structs with named fields");
     };
 
 
-    if fields.iter().any(|field| !field.attrs.iter().any(|attr| attr.path().is_ident("skip"))) && args.is_empty() {
-        println!("eita")
+    if !fields.iter().any(|field| field.attrs.iter().any(|attr| attr.path().is_ident("skip"))) && args.is_empty() {
+        panic!("SkippablePartialEq needs arguments to know what fields to skip");
     }
         
 

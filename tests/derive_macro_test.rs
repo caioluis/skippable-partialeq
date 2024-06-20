@@ -1,11 +1,11 @@
 use chrono::{DateTime, TimeZone, Utc};
 
 #[macro_use]
-extern crate timeless_partialeq;
+extern crate skippable_partialeq;
 
 #[test]
 fn it_works_with_user_attribute_input() {
-    #[derive(Debug, TimelessPartialEq)]
+    #[derive(Debug, SkippablePartialEq)]
     #[exclude_suffix(at, date)]
     pub struct Post {
         pub id: i64,
@@ -63,7 +63,7 @@ fn it_fails_without_custom_derive_macro() {
 
 #[test]
 fn it_checks_optional_timestamps_accordingly() {
-    #[derive(Debug, TimelessPartialEq)]
+    #[derive(Debug, SkippablePartialEq)]
     #[exclude_suffix(at)]
     pub struct Post {
         pub id: i64,
@@ -93,7 +93,7 @@ fn it_checks_optional_timestamps_accordingly() {
 
 #[test]
 fn it_skips_specific_fields() {
-    #[derive(Debug, TimelessPartialEq)]
+    #[derive(Debug, SkippablePartialEq)]
     pub struct Post {
         pub id: i64,
         pub content: String,
